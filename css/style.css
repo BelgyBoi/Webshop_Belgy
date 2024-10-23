@@ -1,0 +1,68 @@
+/* Reset body margin and padding for consistent layout */
+body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    height: 100vh; /* Full viewport height */
+    display: flex;
+    justify-content: center; /* Horizontally center */
+    align-items: center;     /* Vertically center */
+    background-color: #f5f5f5; /* Optional background color */
+}
+
+/* Styling for the login container */
+.login {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    width: 100%; /* Make the login form responsive */
+    max-width: 400px; /* Restrict the maximum width */
+    margin: 0 20px; /* Add a bit of side margin for smaller screens */
+}
+
+/* Styling for form elements */
+.form_title {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.form_field {
+    margin-bottom: 15px;
+}
+
+.form_field input {
+    width: 100%; /* Make inputs responsive */
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.form__field {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.form__field input[type="submit"] {
+    width: auto;
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.form__field input[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+/* Media query for smaller screens */
+@media (max-width: 768px) {
+    .login {
+        max-width: 90%; /* Take up more width on small screens */
+    }
+}
