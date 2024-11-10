@@ -52,6 +52,8 @@ if(!empty($_POST)){
   <title>IMDFlix</title>
   <link rel="stylesheet" href="css/login.css">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+   <link rel="stylesheet" href="css/icon-login.css">
 </head>
 <body class="container">
 		<div class="WebshopLogin">
@@ -68,12 +70,13 @@ if(!empty($_POST)){
 					<?php endif; ?>
 					<div class="form__field">
 						<label for="Email">Email</label>
-						<input class="inpField" type="text" name="email">
+						<input class="inpField" type="text" name="email" required>
 					</div>
 					<div class="form__field">
 						<label for="Password">Password</label>
-						<input class="inpField" type="password" name="password">
+						<input  class="inpField" type="password" name="password" id="password" required>
 					</div>
+					<i class="far fa-eye icon" id="togglePassword"></i>
 	
 					<div class="form__field">
 						<input id="button" type="submit" value="Sign in" class="btn btn--primary">	
@@ -85,5 +88,7 @@ if(!empty($_POST)){
 			</div>
 			<a id="signUpLink" href="signUp.php">Don't have an account yet? Sing up here</a>
 		</div>
+
+		<script src="js/script.js"></script>
 </body>
 </html>

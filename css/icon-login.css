@@ -1,0 +1,8 @@
+.icon {
+    position: absolute;
+    right:240px;
+    top: 52.5%;   
+    transform: translateY(-50%);
+    cursor: pointer;
+    z-index: 1;
+}

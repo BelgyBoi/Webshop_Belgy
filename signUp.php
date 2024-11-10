@@ -2,11 +2,18 @@
 include_once 'classes/db.php';
 
 if(!empty($_POST)){
+
+    if (!isset($_POST['confirm_password'])) { echo "The 'confirm_password' field is not set in the POST array."; } else {
+    var_dump($_POST);
     $email = $_POST['email'];
     $first_name = $_POST['first_name'];
     $last_name = $_POST['last_name'];
     $password = $_POST['password'];
+    $confirm_password = $_POST['confirm_password'];
 
+    if($password !== $confirm_password){
+        $error = 'Passwords do not match';
+    } else {
     $options = [
         'cost' => 12,
     ];
@@ -19,6 +26,9 @@ if(!empty($_POST)){
     $statement->bindValue(':last_name', $last_name);
     $statement->bindValue(':password', $hash);
     $statement->execute();
+    header('Location: login.php');
+    }
+}
 }
 ?>
 <!DOCTYPE html>
@@ -29,20 +39,14 @@ if(!empty($_POST)){
     <title>Document</title>
     <link rel="stylesheet" href="css/login.css">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="css/icon-signup.css">
 </head>
 <body>
 <div class="WebshopLogin">
 			<div class="form form--login">
 				<form action="" method="post">
-					<h2 form__title>Sign In</h2>
-	
-					<?php if( isset($error) ): ?>
-					<div class="form__error">
-						<p>
-							Sorry, we can't log you in with that email address and password. Can you try again?
-						</p>
-					</div>
-					<?php endif; ?>
+					<h2 form__title>Sign Up</h2>
 					<div class="form__field">
 						<label for="Email">Email</label>
 						<input class="inpField" type="text" name="email">
@@ -57,8 +61,14 @@ if(!empty($_POST)){
 					</div> 
 					<div class="form__field">
 						<label for="Password">Password</label>
-						<input class="inpField" type="password" name="password">
+						<input class="inpField" type="password" name="password" required>
 					</div>
+                    <i class="far fa-eye icon" id="togglePassword"></i>
+                    <div class="form__field">
+						<label id="confirm" for="ConfirmPassword"> Confirm password</label>
+						<input class="inpField" type="password" name="confirm_password" id="confirm_password" required>
+					</div>
+                    <i class="far fa-eye boo" id="togglePassword"></i>
 	
 					<div class="form__field">
 						<input id="button" type="submit" value="Sign up" class="btn btn--primary">	
@@ -67,5 +77,8 @@ if(!empty($_POST)){
 			</div>
 			<a id="signUpLink" href="login.php">Already have an account? Login instead</a>
 		</div>
+
+        <script src="js/script.js"></script>
+
 </body>
 </html>

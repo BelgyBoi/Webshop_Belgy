@@ -1,4 +1,8 @@
-<!DOCTYPE html>
+<?php
+
+include_once 'classes/db.php';
+
+?><!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -6,7 +10,8 @@
     <title>Document</title>
     <link rel="stylesheet" href="css/style.css"> 
 </head>
-<body>
-    
+<body> <div>
+        <a href=""></a>
+    </div>
 </body>
 </html>

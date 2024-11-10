@@ -1,0 +1,21 @@
+.icon {
+    position: absolute;
+    right:240px;
+    bottom: 42%;   
+    transform: translateY(-50%);
+    cursor: pointer;
+    z-index: 1;
+}
+
+.boo {
+    position: absolute;
+    right:240px;
+    bottom: 35.4%;   
+    transform: translateY(-50%);
+    cursor: pointer;
+    z-index: 1;
+}
+
+#confirm {
+    max-width: min-content;
+}
