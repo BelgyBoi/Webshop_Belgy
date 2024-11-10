@@ -17,7 +17,6 @@ body{
     padding: 20px;
 }
 
-/* Styling for form elements */
 .form_title {
     text-align: center;
     margin-bottom: 20px;
@@ -79,12 +78,12 @@ input[type="text"], input[type="password"] {
 }
 
 #signUpLink {
-    text-decoration: none;
+    text-decoration: underline;
     color: black;
     font-size: .7em;
     display: block;
     margin-top: 25px;
-   
+    
 }
 
 #button {

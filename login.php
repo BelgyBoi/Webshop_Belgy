@@ -1,37 +1,51 @@
 <?php
+include 'classes/db.php'; // Ensure this path is correct
 
-	function canLogin($p_email, $p_password){
-		$conn = new PDO('mysql:host=localhost;dbname=webshop_belgy', 'root', '');
-		$statement = $conn -> prepare('SELECT * FROM users WHERE email = :email)');
-		$statement->bindValue(':email', $p_email);
+session_start();
 
-		$user = $statement->fetch(PDO::FETCH_ASSOC);
-		if($user){
-			$hash = $user['password'];
-			if(password_verify ($p_password, $hash)){
-				return true;
-			}
-		} else {
-			//not found
-			return false;
-		}
+function canLogin($p_email, $p_password){
+    $conn = getDBConnection(); // Get the database connection
+    if ($conn) {
+        $statement = $conn->prepare('SELECT * FROM accounts WHERE email_address = :email'); // Corrected query
+        $statement->bindValue(':email', $p_email);
+        $statement->execute(); // Execute the statement
+        
+        $user = $statement->fetch(PDO::FETCH_ASSOC);
+        if($user){
+            $hash = $user['password'];
+            if(password_verify($p_password, $hash)){
+                return true;
+            }
+        } else {
+            // not found
+            return false;
+        }
+    } else {
+        // Connection failed
+        return false;
+    }
+}
+
+// When to log in
+if(!empty($_POST)){
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+
+    if(canLogin($email, $password)){
+        $_SESSION['loggedin'] = true;
+        $_SESSION['email'] = $email;
+		header('Location: index.php');
+    } else {
+        $error = true;
+    }
+
+	if (isset($_POST['rememberMe'])) {
+		setcookie('email', $email, time() + 60 * 60 * 24 * 30);
+		setcookie('password', $password, time() + 60 * 60 * 24 * 30);	
 	}
-
-	// wanneer gaan we pas inloggen
-	if(!empty($_POST)){
-		$email = $_POST['email'];
-		$password = $_POST['password'];
-
-		if(canLogin($email, $password)){
-			session_start();
-			$_SESSION['loggedin'] = true;
-			$_SESSION['email'] = $email;
-		} else {
-			$error = true;
-		}
-	}
-
-?><!DOCTYPE html>
+}
+?>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
