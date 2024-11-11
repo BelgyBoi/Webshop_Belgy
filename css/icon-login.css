@@ -1,8 +1,17 @@
-.icon {
+.form__field{
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.icon{
     position: absolute;
-    right:240px;
-    top: 52.5%;   
-    transform: translateY(-50%);
+    right: 10px;
     cursor: pointer;
     z-index: 1;
+}
+
+.inpField{
+    width: 50%;
+    padding-right: 30px;
 }

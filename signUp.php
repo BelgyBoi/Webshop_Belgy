@@ -1,35 +1,45 @@
 <?php
 include_once 'classes/db.php';
 
-if(!empty($_POST)){
+session_start();
 
-    if (!isset($_POST['confirm_password'])) { echo "The 'confirm_password' field is not set in the POST array."; } else {
-    var_dump($_POST);
+$email = '';
+$first_name = '';
+$last_name = '';
+$password = '';
+$confirm_password = '';
+$error = '';
+
+if(!empty($_POST)){ 
     $email = $_POST['email'];
     $first_name = $_POST['first_name'];
     $last_name = $_POST['last_name'];
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
 
-    if($password !== $confirm_password){
-        $error = 'Passwords do not match';
+    if (!empty($email) && !empty($first_name) && !empty($last_name) && !empty($password) && !empty($confirm_password)){
+        if($password === $confirm_password){
+            $options = ['cost' => 12];
+            $hash = password_hash($password, PASSWORD_DEFAULT, $options);
+            
+            $conn = getDBConnection();
+            $statement = $conn->prepare('INSERT INTO accounts (email_address, Firstname, Lastname, password) VALUES (:email, :first_name, :last_name, :password)');
+            $statement->bindValue(':email', $email);
+            $statement->bindValue(':first_name', $first_name);
+            $statement->bindValue(':last_name', $last_name);
+            $statement->bindValue(':password', $hash);
+            $statement->execute();
+            header('Location: login.php');
+            exit();  
+         } else {
+            $error = 'Passwords do not match';
+        }
     } else {
-    $options = [
-        'cost' => 12,
-    ];
-    $hash = password_hash($password, PASSWORD_DEFAULT, $options);
-
-    $conn = getDBConnection();
-    $statement = $conn->prepare('INSERT INTO accounts (email_address, Firstname, Lastname, password) VALUES (:email, :first_name, :last_name, :password)');
-    $statement->bindValue(':email', $email);
-    $statement->bindValue(':first_name', $first_name);
-    $statement->bindValue(':last_name', $last_name);
-    $statement->bindValue(':password', $hash);
-    $statement->execute();
-    header('Location: login.php');
+        $error = 'Please fill in all fields';
     }
 }
-}
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -47,28 +57,35 @@ if(!empty($_POST)){
 			<div class="form form--login">
 				<form action="" method="post">
 					<h2 form__title>Sign Up</h2>
+                    <?php if( isset($error) ): ?>
+					<div class="form__error">
+						<p>
+                            <?php echo $error; ?>
+						</p>
+					</div>
+					<?php endif; ?>
 					<div class="form__field">
 						<label for="Email">Email</label>
-						<input class="inpField" type="text" name="email">
+						<input class="inpField" type="text" name="email" value="<?php echo htmlspecialchars($email);?>">
 					</div>
                     <div class="form__field">
 						<label for="Email">First name</label>
-						<input class="inpField" type="text" name="first_name">
+						<input class="inpField" type="text" name="first_name" value="<?php echo htmlspecialchars($first_name);?>">
 					</div>
                     <div class="form__field">
 						<label for="Email">Last name</label>
-						<input class="inpField" type="text" name="last_name">
+						<input class="inpField" type="text" name="last_name" value="<?php echo htmlspecialchars($last_name);?>">
 					</div> 
 					<div class="form__field">
 						<label for="Password">Password</label>
-						<input class="inpField" type="password" name="password" required>
+						<input class="inpField" type="password" name="password" id="password" required value="<?php echo htmlspecialchars($password);?>">
+                        <i class="far fa-eye icon" id="togglePassword1"></i>
 					</div>
-                    <i class="far fa-eye icon" id="togglePassword"></i>
                     <div class="form__field">
 						<label id="confirm" for="ConfirmPassword"> Confirm password</label>
-						<input class="inpField" type="password" name="confirm_password" id="confirm_password" required>
+						<input class="inpField" type="password" name="confirm_password" id="confirm_password" required value="<?php echo htmlspecialchars($confirm_password);?>">
+                        <i class="far fa-eye boo" id="togglePassword2"></i>
 					</div>
-                    <i class="far fa-eye boo" id="togglePassword"></i>
 	
 					<div class="form__field">
 						<input id="button" type="submit" value="Sign up" class="btn btn--primary">	
@@ -78,7 +95,7 @@ if(!empty($_POST)){
 			<a id="signUpLink" href="login.php">Already have an account? Login instead</a>
 		</div>
 
-        <script src="js/script.js"></script>
+        <script src="js/signup.js"></script>
 
 </body>
 </html>

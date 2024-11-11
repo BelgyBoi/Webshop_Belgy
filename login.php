@@ -74,9 +74,9 @@ if(!empty($_POST)){
 					</div>
 					<div class="form__field">
 						<label for="Password">Password</label>
-						<input  class="inpField" type="password" name="password" id="password" required>
+						<input  class="inpField" type="password" name="password" id="current_password" required>
+						<i class="far fa-eye icon" id="togglePassword"></i>
 					</div>
-					<i class="far fa-eye icon" id="togglePassword"></i>
 	
 					<div class="form__field">
 						<input id="button" type="submit" value="Sign in" class="btn btn--primary">	
@@ -89,6 +89,6 @@ if(!empty($_POST)){
 			<a id="signUpLink" href="signUp.php">Don't have an account yet? Sing up here</a>
 		</div>
 
-		<script src="js/script.js"></script>
+		<script src="js/login.js"></script>
 </body>
 </html>
