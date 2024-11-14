@@ -1,0 +1,12 @@
+{
+    "name": "tibok/webshop_belgy",
+    "description": "a webshop with a login and signup feature and an admin account",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "WebshopBelgy\\": "classes/"
+        }
+    },
+    "minimum-stability": "stable",
+    "require": {}
+}

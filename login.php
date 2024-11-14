@@ -1,10 +1,13 @@
 <?php
-include 'classes/db.php'; // Ensure this path is correct
+
+require 'vendor/autoload.php';
+
+use WebshopBelgy\Database;
 
 session_start();
 
 function canLogin($p_email, $p_password){
-    $conn = getDBConnection(); // Get the database connection
+    $conn = Database::getConnection(); // Get the database connection
     if ($conn) {
         $statement = $conn->prepare('SELECT * FROM accounts WHERE email_address = :email'); // Corrected query
         $statement->bindValue(':email', $p_email);

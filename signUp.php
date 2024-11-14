@@ -1,5 +1,8 @@
 <?php
-include_once 'classes/db.php';
+require 'vendor/autoload.php';
+
+use WebshopBelgy\Database;
+
 
 session_start();
 
@@ -22,7 +25,7 @@ if(!empty($_POST)){
             $options = ['cost' => 12];
             $hash = password_hash($password, PASSWORD_DEFAULT, $options);
             
-            $conn = getDBConnection();
+            $conn = Database::getConnection();
             $statement = $conn->prepare('INSERT INTO accounts (email_address, Firstname, Lastname, password) VALUES (:email, :first_name, :last_name, :password)');
             $statement->bindValue(':email', $email);
             $statement->bindValue(':first_name', $first_name);
