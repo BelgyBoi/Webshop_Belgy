@@ -85,7 +85,7 @@ input[type="text"], input[type="password"] {
     margin-top: 25px;
     
 }
- n 
+ 
 #button {
     width: 25%;
     padding: 10px;
@@ -100,23 +100,88 @@ input[type="text"], input[type="password"] {
     background-color: #ff0000;
 }
 
+/* Navbar styling */
 #navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 10px 20px;
-    background-color: #333;
+    background-color: red;
     color: white;
 }
 
-#logo {
+#navbar i{
+    color: white;
+}
+
+#logo img{
     max-width: 75px;
     max-height: auto;
 }
 
-/* Media query for smaller screens */
-@media (max-width: 768px) {
-    .login {
-        max-width: 90%; /* Take up more width on small screens */
-    }
+/* Right-side icons */
+#navbar-icons {
+    display: flex;
+    align-items: center;
 }
+
+#navbar-icons a {
+    margin-left: 10px;
+    color: white;
+    text-decoration: none;
+}
+
+/* Basic styles for widgets */
+.widget {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0; /* For hamburger menu widget */
+    right: 0; /* For search widget */
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    overflow: auto;
+}
+
+.widget.open {
+    display: flex;
+    flex-direction: column;
+}
+
+#hamburger-widget {
+    align-items: flex-start;
+    padding: 20px;
+    left: -100%; /* Hide off-screen initially */
+    transition: left 0.3s ease-in-out;
+}
+
+#hamburger-widget.open {
+    left: 0; /* Slide in from the left */
+}
+
+#search-widget {
+    align-items: center;
+    padding: 20px;
+    right: -100%; /* Hide off-screen initially */
+    transition: right 0.3s ease-in-out;
+}
+
+#search-widget.open {
+    right: 0; /* Slide in from the right */
+}
+
+button#close-hamburger,
+button#close-search {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5em;
+    cursor: pointer;
+    align-self: flex-end;
+}
+
