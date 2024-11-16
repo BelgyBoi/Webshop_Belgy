@@ -1,4 +1,21 @@
-<!DOCTYPE html>
+<?php
+
+require 'vendor/autoload.php';
+
+use WebshopBelgy\Database;
+use WebshopBelgy\CategoryFetcher;
+
+$conn = Database::getConnection();
+
+if ($conn) {
+    $fetcher = new CategoryFetcher($conn);
+    $categories = $fetcher->getCategories();
+} else {
+    echo 'Connection failed';
+}
+
+
+?><!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -41,13 +58,23 @@
 
     <!-- Hamburger menu widget -->
     <div id="hamburger-widget" class="widget">
-        <button id="close-hamburger">Close</button>
-        <!-- Content for the hamburger menu -->
+        <button id="close-hamburger">Cancel</button>
+        <ul>
+            <?php
+                if(!empty($categories)){
+                    foreach($categories as $category){
+                        echo '<li><a href="category.php?id=' . $category['id'] . '">' . $category['name'] . '</a></li>';
+                    }   
+                } else {
+                    echo 'No categories found';
+                }
+            
+            ?>
+        </ul>
     </div>
 
-    <!-- Search bar widget -->
     <div id="search-widget" class="widget">
-        <button id="close-search">Close</button>
+        <button id="close-search">Cancel</button>
         <form action="" id="search-form">
             <input type="text" id="search-bar" placeholder="What are you looking for?">
         </form>
