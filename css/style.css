@@ -123,65 +123,112 @@ input[type="text"], input[type="password"] {
 #navbar-icons {
     display: flex;
     align-items: center;
+    row-gap: 10px;
 }
 
 #navbar-icons a {
     margin-left: 10px;
     color: white;
     text-decoration: none;
+    padding:0 10px ;
 }
 
+#navbar .fas{
+    font-size: 1.2em;
+}
+
+/* Basic styles for widgets */
+/* Basic styles for widgets */
 /* Basic styles for widgets */
 .widget {
     display: none;
     position: fixed;
     top: 0;
-    left: 0; /* For hamburger menu widget */
-    right: 0; /* For search widget */
     height: 100%;
     width: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
-    color: white;
+    background-color: white;
+    color: red;
     z-index: 1000;
     align-items: center;
     justify-content: center;
     overflow: auto;
+    transition: transform 0.5s ease-in-out;
 }
 
-.widget.open {
-    display: flex;
-    flex-direction: column;
-}
-
+/* Hamburger menu styles */
 #hamburger-widget {
-    align-items: flex-start;
-    padding: 20px;
-    left: -100%; /* Hide off-screen initially */
-    transition: left 0.3s ease-in-out;
+    left: 0;
+    transform: translateX(-100%);
 }
 
 #hamburger-widget.open {
-    left: 0; /* Slide in from the left */
+    display: flex;
+    transform: translateX(0);
 }
 
+/* Search widget styles */
 #search-widget {
-    align-items: center;
-    padding: 20px;
-    right: -100%; /* Hide off-screen initially */
-    transition: right 0.3s ease-in-out;
+    right: 0;
+    transform: translateX(100%);
 }
 
 #search-widget.open {
-    right: 0; /* Slide in from the right */
+    display: flex;
+    transform: translateX(0);
 }
 
+/* Close buttons */
 button#close-hamburger,
 button#close-search {
+    position: absolute;
+    top: 5%;
+    right: 10%;
     background: none;
     border: none;
-    color: white;
+    color: red;
     font-size: 1.5em;
     cursor: pointer;
     align-self: flex-end;
+}
+
+
+/* Slide-in and slide-out animations */
+@keyframes slideIn {
+    from {
+        transform: translateX(-100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-100%);
+    }
+}
+
+.list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 95%;
+}
+
+.list a:not(:last-child) {
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 10px;
+}
+
+.list a {
+    text-decoration: none;
+    color: red;
+    font-size: 1.5em;
 }
 
