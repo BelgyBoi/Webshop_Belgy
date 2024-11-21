@@ -232,3 +232,51 @@ button#close-search {
     font-size: 1.5em;
 }
 
+.product_item {
+    display: grid;
+    grid-template-columns: 150px 1fr auto; /* Three columns: image, details, button */
+    grid-template-rows: 1fr 1fr; /* Two rows */
+    align-items: center;
+    gap: 10px;
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-bottom: 10px;
+    text-decoration: none;
+    color: inherit;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.product_image {
+    grid-row: 1 / span 2; /* Span both rows */
+    width: 150px;
+    height: 150px;
+    object-fit: contain; /* Ensures the image is fully visible without distortion */
+    margin-right: 15px;
+}
+
+.product_data{
+    padding-left: 10px;
+}
+
+.product_name {
+    grid-column: 2;
+    grid-row: 1;
+    font-size: .5em;
+    margin: 0;
+    display: flex;
+    align-self: end;
+    justify-content: center;
+    padding-left: 10px;
+}
+
+.product_price {
+    grid-column: 2;
+    grid-row: 2;
+    font-size: .5em;
+    color: #444;
+    margin: 0;
+    display: flex;
+    align-self: start;
+    
+}

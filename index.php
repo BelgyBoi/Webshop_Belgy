@@ -4,17 +4,22 @@ require 'vendor/autoload.php';
 
 use WebshopBelgy\Database;
 use WebshopBelgy\CategoryFetcher;
+use WebshopBelgy\ProductFetcher;
 
 $conn = Database::getConnection();
+$products = [];
 
 if ($conn) {
     $fetcher = new CategoryFetcher($conn);
     $categories = $fetcher->getCategories();
+    
+    // Fetch all products - you can change this to fetch by category if needed
+    $productFetcher = new ProductFetcher($conn);
+    $products = $productFetcher->getAllProducts();
 } else {
     echo 'Connection failed';
     $products = [];
 }
-
 
 ?><!DOCTYPE html>
 <html lang="en">
@@ -35,23 +40,27 @@ include_once("classes/widgets.php");
 
 <div class="list">
     <?php
-        if (!empty($categories)) {
+        if (!empty($products)) {
             foreach ($products as $product) {
-                echo '<div class="product-item">';
-                echo '<img src="' . $product['main_image_image'] . '" alt="' . $product['name'] . '">';
-                echo '<h2>' . $product['name'] . '</h2>';
-                echo '<p>' . $product['description'] . '</p>';
-                echo '<p>€' . $product['price'] . '</p>';
+                echo '<a class="product_item" href="focus.php?product_id=' . $product['id'] . '">'; // Wrap the whole item with <a>
+                echo '<img class="product_image" src="' . $product['main_image_url'] . '" alt="' . $product['name'] . '">';
+                echo '<h2 class="product_name product_data">' . $product['name'] . '</h2>';
+                echo '<p class="product_price product_data">€' . $product['price'] . '</p>';
+                echo '<div';
+                echo '<button class="product_button">Add to cart</button>';
                 echo '</div>';
+                echo '</a>'; // Close the <a> tag
             }
+        } else {
+            echo '<p>No products available.</p>';
         }
     ?>
 </div>
 
 
+</div>
 
-
-    <script src="js/nav.js"></script>
-    <script src="js/data.js"></script>
+<script src="js/nav.js"></script>
+<script src="js/data.js"></script>
 </body>
 </html>
