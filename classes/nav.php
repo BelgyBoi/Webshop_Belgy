@@ -17,7 +17,7 @@
             </a>
 
             <!-- User page icon -->
-            <a href="user-page.php" id="user-page" aria-label="User page">
+            <a href="user.php" id="user-page" aria-label="User page">
                 <i class="fas fa-user"></i>
             </a>
 

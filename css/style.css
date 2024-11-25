@@ -191,6 +191,17 @@ button#close-search {
     align-self: flex-end;
 }
 
+#search-form{
+    align-self: start;
+    padding-top: 45px;
+    margin-right: 55px;
+}
+
+#search-bar{
+    width: 250px;
+    height: 25px;
+}
+
 
 /* Slide-in and slide-out animations */
 @keyframes slideIn {
@@ -232,6 +243,16 @@ button#close-search {
     font-size: 1.5em;
 }
 
+.product_list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+
 .product_item {
     display: grid;
     grid-template-columns: 150px 1fr auto; /* Three columns: image, details, button */
@@ -262,7 +283,7 @@ button#close-search {
 .product_name {
     grid-column: 2;
     grid-row: 1;
-    font-size: .5em;
+    font-size: 1em;
     margin: 0;
     display: flex;
     align-self: end;
@@ -273,10 +294,96 @@ button#close-search {
 .product_price {
     grid-column: 2;
     grid-row: 2;
-    font-size: .5em;
+    font-size: 1em;
     color: #444;
     margin: 0;
     display: flex;
     align-self: start;
     
 }
+
+.product-details {
+    padding: 20px;
+}
+
+.product-details {
+    padding: 20px;
+}
+
+.carousel {
+    width: 80%;
+    margin: 0 auto; /* Center carousel */
+}
+
+.carousel img {
+    width: 100%;
+    height: auto;
+}
+
+.carousel-thumbnails {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.carousel-thumbnails .slick-slide {
+    margin: 0 5px; /* Adjust the margin between thumbnails */
+}
+
+.carousel-thumbnails img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    opacity: 0.5;
+    transition: opacity 0.3s;
+}
+
+.carousel-thumbnails img:hover, .carousel-thumbnails .slick-current img {
+    opacity: 1;
+}
+
+.product-description {
+    margin: 20px 0;
+}
+
+.product-price {
+    font-size: 1.5em;
+    color: #444;
+}
+
+.add-to-cart {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: red;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.add-to-cart:hover {
+    background-color: rgb(181, 0, 0);
+}
+
+.focus_image {
+    width: 150px;
+    height: 150px;
+    object-fit: cover; /* Ensures the image covers the whole area without distortion */
+    margin-right: 15px;
+}
+
+.small_image {
+    width: 50px;
+    height: 50px;
+    object-fit: cover; /* Ensures the thumbnail covers the whole area without distortion */
+    margin: 0 5px; /* Adjust the margin between thumbnails */
+    opacity: 0.5;
+    transition: opacity 0.3s;
+}
+
+.small_image:hover, .carousel-thumbnails .slick-current img {
+    opacity: 1;
+}
+

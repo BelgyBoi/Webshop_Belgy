@@ -1,5 +1,7 @@
 <?php
 
+session_start();
+
 require 'vendor/autoload.php';
 
 use WebshopBelgy\Database;
@@ -21,7 +23,11 @@ if ($conn) {
     $products = [];
 }
 
-?><!DOCTYPE html>
+error_log('Session Variables: ' . print_r($_SESSION, true));
+
+
+?>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -38,7 +44,7 @@ include_once("classes/nav.php");
 include_once("classes/widgets.php");
 ?>
 
-<div class="list">
+<div class="product_list">
     <?php
         if (!empty($products)) {
             foreach ($products as $product) {

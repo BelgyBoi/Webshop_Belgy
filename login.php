@@ -4,6 +4,7 @@ require 'vendor/autoload.php';
 
 use WebshopBelgy\Database;
 
+
 session_start();
 
 function canLogin($p_email, $p_password){
@@ -19,32 +20,27 @@ function canLogin($p_email, $p_password){
             if(password_verify($p_password, $hash)){
                 return true;
             }
-        } else {
-            // not found
-            return false;
         }
-    } else {
-        // Connection failed
-        return false;
     }
-}
+     return false;
+    }
 
 // When to log in
-if(!empty($_POST)){
-    $email = $_POST['email'];
-    $password = $_POST['password'];
+if ($_SERVER['REQUEST_METHOD'] == 'POST') { 
+	$email = $_POST['email']; 
+	$password = $_POST['password']; 
 
-    if(canLogin($email, $password)){
-        $_SESSION['loggedin'] = true;
-        $_SESSION['email'] = $email;
-		header('Location: index.php');
-    } else {
-        $error = true;
-    }
-
-	if (isset($_POST['rememberMe'])) {
-		setcookie('email', $email, time() + 60 * 60 * 24 * 30);
-		setcookie('password', $password, time() + 60 * 60 * 24 * 30);	
+	if (canLogin($email, $password)) { 
+		$_SESSION['loggedin'] = true; 
+		$_SESSION['email'] = $email; 
+		header('Location: index.php'); 
+		exit(); 
+	} else { 
+		$error = true; 
+	} 
+	if (isset($_POST['rememberMe'])) { 
+		setcookie('email', $email, time() + 60 * 60 * 24 * 30); 
+	setcookie('password', $password, time() + 60 * 60 * 24 * 30);
 	}
 }
 ?>
