@@ -16,10 +16,16 @@
             <i class="fas fa-search"></i>
         </a>
 
-        <!-- User page icon -->
-        <a href="user.php" id="user-page" aria-label="User page">
-            <i class="fas fa-user"></i>
-        </a>
+        <!-- User page dropdown -->
+        <div id="user-dropdown">
+            <a href="#" id="user-page" aria-label="User page">
+                <i class="fas fa-user"></i>
+            </a>
+            <div id="user-menu">
+                <a href="user.php">View Account</a>
+                <a href="classes/logout.php">Logout</a> <!-- Updated path to match correct location -->
+            </div>
+        </div>
 
         <!-- Shopping cart icon -->
         <a href="cart.php" id="shopping-cart" aria-label="Shopping cart">

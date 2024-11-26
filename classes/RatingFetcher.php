@@ -12,7 +12,7 @@ class RatingFetcher {
     }
 
     public function getRatingsByProductId($productId) {
-        $stmt = $this->conn->prepare('SELECT * FROM ratings WHERE product_id = :product_id ORDER BY created_at DESC');
+        $stmt = $this->conn->prepare('SELECT ratings.*, accounts.firstname, accounts.lastname FROM ratings JOIN accounts ON ratings.user_id = accounts.id WHERE ratings.product_id = :product_id ORDER BY ratings.created_at DESC');
         $stmt->execute(['product_id' => $productId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }

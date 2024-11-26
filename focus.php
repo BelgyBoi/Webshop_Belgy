@@ -1,13 +1,17 @@
 <?php
+session_start();
+
+if (!isset($_SESSION['user_id'])) {
+    echo 'Please log in to submit a rating.';
+    exit;
+}
 
 require 'vendor/autoload.php';
 
 use WebshopBelgy\Database;
 use WebshopBelgy\ProductFetcher;
-use WebshopBelgy\CartFunction;
 use WebshopBelgy\RatingFetcher;
 
-session_start();
 $conn = Database::getConnection();
 
 $product = null;
@@ -28,12 +32,25 @@ if ($conn) {
             $ratingFetcher = new RatingFetcher($conn);
             $ratings = $ratingFetcher->getRatingsByProductId($product_id);
             $averageRating = $ratingFetcher->getAverageRating($product_id);
+        } else {
+            echo 'Product not found';
+            var_dump($product); // Debugging output
+            exit;
         }
+    } else {
+        echo 'Product ID is invalid';
+        var_dump($product_id); // Debugging output
+        exit;
     }
+} else {
+    echo 'Connection failed';
+    var_dump($conn); // Debugging output
+    exit;
 }
 
 if (!$product) {
     echo 'Product not found or connection failed';
+    var_dump($product); // Debugging output
     exit;
 }
 
@@ -88,6 +105,7 @@ include_once("classes/widgets.php");
         <?php if (!empty($ratings)): ?>
             <?php foreach ($ratings as $rating): ?>
                 <div class="rating">
+                    <p><b><?php echo htmlspecialchars($rating['firstname']) . ' ' . htmlspecialchars($rating['lastname']); ?></b></p>
                     <p>Rating: 
                         <?php for ($i = 1; $i <= 5; $i++): ?>
                             <?php if ($i <= $rating['rating']): ?>
@@ -99,6 +117,9 @@ include_once("classes/widgets.php");
                     </p>
                     <p><?php echo htmlspecialchars($rating['review']); ?></p>
                     <p><small><?php echo htmlspecialchars($rating['created_at']); ?></small></p>
+                    <?php if ($_SESSION['user_id'] == $rating['user_id']): ?>
+                        <button class="delete-rating" data-rating-id="<?php echo $rating['id']; ?>"><i class="fas fa-trash-alt"></i></button>
+                    <?php endif; ?>
                 </div>
             <?php endforeach; ?>
         <?php else: ?>
@@ -109,7 +130,7 @@ include_once("classes/widgets.php");
     <!-- Rating Form -->
     <div class="rating-form">
         <h3>Submit Your Rating</h3>
-        <form action="submit_rating.php" method="post">
+        <form action="classes/submit_rating.php" method="post">
             <input type="hidden" name="product_id" value="<?php echo $product_id; ?>">
             <input type="hidden" id="rating" name="rating" value="">
             <label for="rating">Rating:</label>

@@ -34,7 +34,7 @@ $(document).ready(function() {
 
     // Star rating hover and click functionality
     $('.star-rating .fa-star').on('mouseover', function() {
-        const onStar = parseInt($(this).data('value'), 10); // Get the value of the hovered star
+        const onStar = parseInt($(this).data('value'), 10);
         $(this).parent().children('i.fa-star').each(function(e) {
             if (e < onStar) {
                 $(this).addClass('hover');
@@ -47,20 +47,35 @@ $(document).ready(function() {
     });
 
     $('.star-rating .fa-star').on('click', function() {
-        const onStar = parseInt($(this).data('value'), 10); // Get the value of the clicked star
+        const onStar = parseInt($(this).data('value'), 10);
         const stars = $(this).parent().children('i.fa-star');
 
         if ($(this).hasClass('selected') && $(this).next().hasClass('selected') === false) {
-            // Deselect if clicking on the selected star again
             $(this).removeClass('selected');
             $('#rating').val(0);
         } else {
-            // Select stars
             stars.removeClass('selected');
             for (let i = 0; i < onStar; i++) {
                 stars.eq(i).addClass('selected');
             }
-            $('#rating').val(onStar); // Update the hidden input with the rating value
+            $('#rating').val(onStar);
         }
+    });
+
+    // Handle delete rating
+    $('.delete-rating').on('click', function() {
+        const ratingId = $(this).data('rating-id');
+        $.ajax({
+            url: 'classes/delete_ratings.php',
+            type: 'POST',
+            data: { rating_id: ratingId },
+            success: function(response) {
+                if (response === 'success') {
+                    location.reload(); // Reload the page to update the ratings display
+                } else {
+                    alert('Error deleting rating');
+                }
+            }
+        });
     });
 });
