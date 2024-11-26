@@ -1,5 +1,4 @@
 <?php
-
 session_start();
 
 require 'vendor/autoload.php';
@@ -15,7 +14,6 @@ if ($conn) {
     $fetcher = new CategoryFetcher($conn);
     $categories = $fetcher->getCategories();
     
-    // Fetch all products - you can change this to fetch by category if needed
     $productFetcher = new ProductFetcher($conn);
     $products = $productFetcher->getAllProducts();
 } else {
@@ -25,16 +23,14 @@ if ($conn) {
 
 error_log('Session Variables: ' . print_r($_SESSION, true));
 
-
-?>
-<!DOCTYPE html>
+?><!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Responsive Navbar</title>
     <link rel="stylesheet" href="css/normalize.css">
-    <link rel="stylesheet" href="css/style.css"> 
+    <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
@@ -43,30 +39,32 @@ error_log('Session Variables: ' . print_r($_SESSION, true));
 include_once("classes/nav.php"); 
 include_once("classes/widgets.php");
 ?>
-
-<div class="product_list">
-    <?php
+<div id="indexBody">
+    <div class="product_list">
+        <?php
         if (!empty($products)) {
             foreach ($products as $product) {
-                echo '<a class="product_item" href="focus.php?product_id=' . $product['id'] . '">'; // Wrap the whole item with <a>
+                echo '<div class="product_item">';
+                echo '<a class="product_link" href="focus.php?product_id=' . $product['id'] . '">';
                 echo '<img class="product_image" src="' . $product['main_image_url'] . '" alt="' . $product['name'] . '">';
-                echo '<h2 class="product_name product_data">' . $product['name'] . '</h2>';
-                echo '<p class="product_price product_data">€' . $product['price'] . '</p>';
-                echo '<div';
-                echo '<button class="product_button">Add to cart</button>';
+                echo '<div class="product_data">';
+                echo '<h2 class="product_name">' . $product['name'] . '</h2>';
+                echo '<p class="product_price">€' . $product['price'] . '</p>';
                 echo '</div>';
-                echo '</a>'; // Close the <a> tag
+                echo '</a>';
+                echo '<button class="product_button add-to-cart" data-id="' . $product['id'] . '" data-name="' . $product['name'] . '" data-price="' . $product['price'] . '" data-image="' . $product['main_image_url'] . '">Add to cart</button>';
+                echo '</div>';
             }
         } else {
             echo '<p>No products available.</p>';
         }
-    ?>
+        ?>
+    </div>
 </div>
 
-
-</div>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="js/nav.js"></script>
 <script src="js/data.js"></script>
+<script src="js/index.js"></script>
 </body>
 </html>
