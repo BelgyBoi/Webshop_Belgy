@@ -1,6 +1,13 @@
 <?php
 session_start();
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+// Log session variables for debugging
+error_log('Session Variables in user.php: ' . print_r($_SESSION, true));
+
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    error_log('User not logged in, redirecting to login.php');
     header('Location: login.php');
     exit();
 }
@@ -10,15 +17,50 @@ require 'vendor/autoload.php';
 use WebshopBelgy\Database;
 
 $conn = Database::getConnection();
-$email = $_SESSION['email'];
-$statement = $conn->prepare('SELECT * FROM accounts WHERE email_address = :email');
-$statement->bindValue(':email', $email);
-$statement->execute();
-$user = $statement->fetch(PDO::FETCH_ASSOC);
-$firstname = $user['Firstname'];
-$lastname = $user['Lastname'];
-?>
+$response = [];
 
+if ($conn && isset($_SESSION['email'])) {
+    $email = $_SESSION['email'];
+    error_log('Email from session: ' . $email); // Debugging line
+
+    $statement = $conn->prepare('SELECT * FROM accounts WHERE email_address = :email');
+    $statement->bindValue(':email', $email);
+    $statement->execute();
+    $user = $statement->fetch(PDO::FETCH_ASSOC);
+
+    if ($user) {
+        error_log('User found: ' . print_r($user, true)); // Debugging line
+        
+        // Correct case sensitivity
+        $firstname = $user['Firstname'] ?? 'Unknown';
+        $lastname = $user['Lastname'] ?? 'Unknown';
+        $_SESSION['currency'] = $user['currency'];
+
+        $response = [
+            'success' => true,
+            'email' => $email,
+            'firstname' => $firstname,
+            'lastname' => $lastname,
+            'currency' => $_SESSION['currency']
+        ];
+    } else {
+        error_log('User not found for email: ' . $email);
+        $response = ['success' => false, 'message' => 'User not found'];
+    }
+} else {
+    error_log('Email not set in session');
+    $response = ['success' => false, 'message' => 'Email not set in session'];
+}
+
+// Return JSON response only if requested via AJAX
+if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+    header('Content-Type: application/json');
+    echo json_encode($response);
+    exit();
+}
+
+// Otherwise, render the HTML page
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -37,6 +79,11 @@ $lastname = $user['Lastname'];
         <p>Email: <?php echo htmlspecialchars($email); ?></p>
         <p>First Name: <?php echo htmlspecialchars($firstname); ?></p>
         <p>Last Name: <?php echo htmlspecialchars($lastname); ?></p>
+        <p>Currency: <?php echo htmlspecialchars($_SESSION['currency']); ?> BC</p>
+
+        <p id="view_purch">
+            <a href="purchaseHistory.php">View Purchase History</a>
+        </p> <!-- Added link to purchase history -->
 
         <div id="form-container">
             <div id="message"></div>

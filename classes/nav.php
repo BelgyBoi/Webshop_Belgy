@@ -1,3 +1,9 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+?>
+
 <nav id="navbar">
     <!-- Hamburger menu button -->
     <a href="#" id="hamburger-menu" aria-label="Open menu">
@@ -11,6 +17,16 @@
 
     <!-- Right-side icons -->
     <div id="navbar-icons">
+        <!-- Wallet icon -->
+        <div id="wallet-dropdown">
+            <a href="#" id="wallet-icon" aria-label="Wallet">
+                <i class="fas fa-wallet"></i>
+            </a>
+            <div id="wallet-menu">
+                <p>You have <strong><?php echo isset($_SESSION['currency']) ? $_SESSION['currency'] : '0'; ?> BC</strong></p>
+            </div>
+        </div>
+
         <!-- Search icon -->
         <a href="#" id="search-link" aria-label="Open search">
             <i class="fas fa-search"></i>
@@ -23,7 +39,7 @@
             </a>
             <div id="user-menu">
                 <a href="user.php">View Account</a>
-                <a href="classes/logout.php">Logout</a> <!-- Updated path to match correct location -->
+                <a href="classes/logout.php">Logout</a>
             </div>
         </div>
 

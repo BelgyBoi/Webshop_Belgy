@@ -1,32 +1,27 @@
 <?php
 session_start();
 
-$product_id = isset($_POST['id']) ? intval($_POST['id']) : 0;
-$quantity = 1; // Default quantity to 1
+require '../vendor/autoload.php';
 
-if ($product_id > 0) {
-    if (!isset($_SESSION['cart'])) {
-        $_SESSION['cart'] = [];
-    }
+use WebshopBelgy\CartFunction;
+use WebshopBelgy\Database;
 
-    $found = false;
-    foreach ($_SESSION['cart'] as &$item) {
-        if ($item['id'] == $product_id) {
-            $item['quantity'] += $quantity;
-            $found = true;
-            break;
-        }
-    }
+$conn = Database::getConnection();
 
-    if (!$found) {
-        $_SESSION['cart'][] = [
-            'id' => $product_id,
-            'quantity' => $quantity
-        ];
-    }
+if ($conn && isset($_POST['product_id'])) {
+    $cartFunction = new CartFunction($conn);
+    $productId = intval($_POST['product_id']);
+    $variantId = isset($_POST['variant_id']) ? intval($_POST['variant_id']) : null;
+    $quantity = isset($_POST['quantity']) ? intval($_POST['quantity']) : 1;
 
-    echo json_encode(['status' => 'success', 'cart' => $_SESSION['cart']]);
+    // Debugging statement
+    error_log("Product ID: $productId, Variant ID: $variantId, Quantity: $quantity");
+
+    // Add to cart
+    $cartFunction->addToCart($productId, $quantity, $variantId);
+
+    echo json_encode(['status' => 'success']);
 } else {
-    echo json_encode(['status' => 'error', 'message' => 'Invalid product ID']);
+    echo json_encode(['status' => 'error', 'message' => 'Failed to add item to cart']);
 }
 ?>

@@ -119,4 +119,20 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     });
+
+    // Handle wallet click and toggle visibility
+    const walletIcon = document.getElementById('wallet-icon');
+    const walletMenu = document.getElementById('wallet-menu');
+    const walletDropdown = document.getElementById('wallet-dropdown');
+
+    // Show wallet menu on hover
+    walletDropdown.addEventListener('mouseover', function() {
+        walletDropdown.classList.add('open');
+    });
+
+    walletDropdown.addEventListener('mouseout', function(event) {
+        if (!walletIcon.contains(event.relatedTarget)) {
+            walletDropdown.classList.remove('open');
+        }
+    });
 });

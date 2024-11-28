@@ -1,12 +1,12 @@
 <?php
-
 require 'vendor/autoload.php';
-
 use WebshopBelgy\Database;
 
 session_start();
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-function canLogin($p_email, $p_password) {
+function canLogin($p_email, $p_password){
     $conn = Database::getConnection();
     if ($conn) {
         $statement = $conn->prepare('SELECT * FROM accounts WHERE email_address = :email');
@@ -17,47 +17,51 @@ function canLogin($p_email, $p_password) {
         if($user){
             $hash = $user['password'];
             if(password_verify($p_password, $hash)){
-                return $user; // Return user data on successful login
+                // Store user details in session
+                $_SESSION['loggedin'] = true;
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['email'] = $user['email_address']; // Ensure email is set in session
+                $_SESSION['firstname'] = $user['firstname'] ?? 'Unknown';
+                $_SESSION['lastname'] = $user['lastname'] ?? 'Unknown';
+                $_SESSION['currency'] = $user['currency'] ?? 'EUR';
+                $_SESSION['admin'] = $user['admin'];
+                return true;
             }
         }
     }
     return false;
 }
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') { 
-    $email = $_POST['email']; 
-    $password = $_POST['password']; 
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $input = json_decode(file_get_contents('php://input'), true);
+    $email = $input['email'];
+    $password = $input['password'];
 
-    $user = canLogin($email, $password); // Get user data
-
-    if ($user) { 
-        $_SESSION['loggedin'] = true; 
-        $_SESSION['user_id'] = $user['id']; // Store user_id in session
-        $_SESSION['firstname'] = $user['firstname']; // Store firstname in session
-        $_SESSION['lastname'] = $user['lastname']; // Store lastname in session
-        $_SESSION['email'] = $user['email_address']; 
-
-        header('Location: index.php'); 
-        exit(); 
-    } else { 
-        $error = true; 
+    if (canLogin($email, $password)) {
+        $isAdmin = $_SESSION['admin'];
+        echo json_encode(['success' => true, 'isAdmin' => $isAdmin]);
+    } else {
+        echo json_encode(['success' => false]);
     }
 
-    if (isset($_POST['rememberMe'])) { 
-        setcookie('email', $email, time() + 60 * 60 * 24 * 30); 
+    if (isset($input['rememberMe'])) {
+        setcookie('email', $email, time() + 60 * 60 * 24 * 30);
         setcookie('password', $password, time() + 60 * 60 * 24 * 30);
     }
+    exit();
 }
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>IMDFlix</title>
-  <link rel="stylesheet" href="css/login.css">
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-   <link rel="stylesheet" href="css/icon-login.css">
+    <meta charset="UTF-8">
+    <title>IMDFlix</title>
+    <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="css/icon-login.css">
 </head>
 <body class="container">
     <div class="WebshopLogin">

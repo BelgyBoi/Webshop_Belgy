@@ -1,15 +1,15 @@
 <div id="hamburger-widget" class="widget">
     <button id="close-hamburger">Cancel</button>
     <div class="list">
-        <?php
-            if (!empty($categories)) {
-                foreach ($categories as $cat) {
-                    echo '<a href="#" class="category-link" data-id="' . $cat['id'] . '">' . $cat['name'] . '</a>';
-                }
-            } else {
-                echo 'No categories found';
+        <?php if (!empty($categories)) {
+            foreach ($categories as $cat) {
+                echo '<a href="#" class="category-link" data-id="' . $cat['id'] . '">' . $cat['name'] . '</a>';
             }
-        ?>
+        } else {
+            echo 'No categories found';
+        } ?>
+        <!-- Unfilter Button -->
+        <a href="#" class="unfilter-link">Show All Products</a>
     </div>
 </div>
 
@@ -18,8 +18,6 @@
     <form action="" id="search-form">
         <input type="text" id="search-bar" placeholder="What are you looking for?">
         <div id="search-suggestions" class="suggestions"></div> <!-- Container for search suggestions -->
-        <div id="search-results" class="product_list"></div> <!-- Container for displaying search results -->
+        <div id="search-results" class="products-list"></div> <!-- Ensure this class matches the one in data.js -->
     </form>
 </div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>

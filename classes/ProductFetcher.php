@@ -47,10 +47,35 @@ class ProductFetcher {
         return $product;
     }
 
-    public function getProductImages($productId) { // Changed to public
+    public function getProductImages($productId) {
         $statement = $this->conn->prepare('SELECT image_url FROM product_images WHERE product_id = :product_id');
         $statement->execute(['product_id' => $productId]);
         return $statement->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    public function getProductVariants($productId) {
+        $statement = $this->conn->prepare('SELECT * FROM product_variants WHERE product_id = :product_id');
+        $statement->execute(['product_id' => $productId]);
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getVariantImages($variantId) {
+        $statement = $this->conn->prepare('SELECT image_url FROM variant_images WHERE variant_id = :variant_id');
+        $statement->execute(['variant_id' => $variantId]);
+        return $statement->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    public function searchProducts($search) {
+        $statement = $this->conn->prepare('SELECT * FROM products WHERE name LIKE :search OR id LIKE :search');
+        $statement->bindValue(':search', '%' . $search . '%');
+        $statement->execute();
+        $products = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($products as &$product) {
+            $product['images'] = $this->getProductImages($product['id']);
+        }
+
+        return $products;
     }
 }
 

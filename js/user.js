@@ -3,32 +3,38 @@ $(document).ready(function() {
     const toggleCurrentPassword = document.getElementById('toggleCurrentPassword');
     const currentPassword = document.getElementById('current_password');
 
-    toggleCurrentPassword.addEventListener('click', function() {
-        const type = currentPassword.getAttribute('type') === 'password' ? 'text' : 'password';
-        currentPassword.setAttribute('type', type);
-        this.classList.toggle('fa-eye');
-        this.classList.toggle('fa-eye-slash');
-    });
+    if (toggleCurrentPassword && currentPassword) {
+        toggleCurrentPassword.addEventListener('click', function() {
+            const type = currentPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+            currentPassword.setAttribute('type', type);
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+    }
 
     const toggleNewPassword = document.getElementById('toggleNewPassword');
     const newPassword = document.getElementById('new_password');
 
-    toggleNewPassword.addEventListener('click', function() {
-        const type = newPassword.getAttribute('type') === 'password' ? 'text' : 'password';
-        newPassword.setAttribute('type', type);
-        this.classList.toggle('fa-eye');
-        this.classList.toggle('fa-eye-slash');
-    });
+    if (toggleNewPassword && newPassword) {
+        toggleNewPassword.addEventListener('click', function() {
+            const type = newPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+            newPassword.setAttribute('type', type);
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+    }
 
     const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
     const confirmPassword = document.getElementById('confirm_password');
 
-    toggleConfirmPassword.addEventListener('click', function() {
-        const type = confirmPassword.getAttribute('type') === 'password' ? 'text' : 'password';
-        confirmPassword.setAttribute('type', type);
-        this.classList.toggle('fa-eye');
-        this.classList.toggle('fa-eye-slash');
-    });
+    if (toggleConfirmPassword && confirmPassword) {
+        toggleConfirmPassword.addEventListener('click', function() {
+            const type = confirmPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+            confirmPassword.setAttribute('type', type);
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+    }
 
     // AJAX for verifying and updating passwords
     $('#current_password').on('blur', function() {
@@ -39,11 +45,15 @@ $(document).ready(function() {
                 current_password: $('#current_password').val()
             },
             success: function(response) {
-                var data = JSON.parse(response);
-                if (data.status === 'success') {
-                    $('#current_password').css('border', '1px solid green');
-                } else {
-                    $('#current_password').css('border', '1px solid red');
+                try {
+                    var data = JSON.parse(response);
+                    if (data.status === 'success') {
+                        $('#current_password').css('border', '1px solid green');
+                    } else {
+                        $('#current_password').css('border', '1px solid red');
+                    }
+                } catch (error) {
+                    console.error('JSON parse error:', error);
                 }
             },
             error: function(xhr, status, error) {
@@ -65,11 +75,15 @@ $(document).ready(function() {
                 confirm_password: $('#confirm_password').val()
             },
             success: function(response) {
-                var data = JSON.parse(response);
-                $('#message').text(data.message);
-                if (data.status === 'success') {
-                    $('#password-form')[0].reset();
-                    $('#current_password').css('border', '1px solid #ccc');
+                try {
+                    var data = JSON.parse(response);
+                    $('#message').text(data.message);
+                    if (data.status === 'success') {
+                        $('#password-form')[0].reset();
+                        $('#current_password').css('border', '1px solid #ccc');
+                    }
+                } catch (error) {
+                    console.error('JSON parse error:', error);
                 }
             },
             error: function(xhr, status, error) {
@@ -77,4 +91,28 @@ $(document).ready(function() {
             }
         });
     });
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('user.php', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('User Data:', data);
+                const emailElement = document.querySelector('p.email');
+                const firstnameElement = document.querySelector('p.firstname');
+                const lastnameElement = document.querySelector('p.lastname');
+                const currencyElement = document.querySelector('p.currency');
+
+                // Check if elements exist before setting their text content
+                if (emailElement) emailElement.textContent = 'Email: ' + data.email;
+                if (firstnameElement) firstnameElement.textContent = 'First Name: ' + data.firstname;
+                if (lastnameElement) lastnameElement.textContent = 'Last Name: ' + data.lastname;
+                if (currencyElement) currencyElement.textContent = 'Currency: ' + data.currency + ' BC';
+            } else {
+                console.error('Error:', data.message);
+                window.location.href = 'login.php';
+            }
+        })
+        .catch(error => console.error('Error fetching user data:', error));
 });
