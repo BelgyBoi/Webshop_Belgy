@@ -8,6 +8,7 @@ class Database {
     private static $conn;
 
     public static function getConnection() {
+        
         if (self::$conn === null) {
             try {
                 self::$conn = new PDO('mysql:host=localhost;dbname=webshop_belgy', 'root', '');
