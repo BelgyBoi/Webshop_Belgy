@@ -14,7 +14,7 @@ session_start();
     <div class="container">
         <h1>Checkout Error</h1>
         <p>There was an error processing your purchase. Please ensure you have enough Belgy Coins (BC) and try again.</p>
-        <a href="cart.php">Back to Cart</a>
+        <a href="../cart.php">Back to Cart</a>
     </div>
 </body>
 </html>
