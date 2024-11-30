@@ -3,12 +3,13 @@
     "description": "a webshop with a login and signup feature and an admin account",
     "type": "project",
     "autoload": {
-        "psr-4": {
-            "WebshopBelgy\\": "classes/"
-        }
+      "psr-4": {
+        "WebshopBelgy\\": "classes/"
+      }
     },
     "minimum-stability": "stable",
     "require": {
-        "php": "^7.4 || ^8.0"
+      "php": "^7.4 || ^8.0"
     }
-}
+  }
+  
