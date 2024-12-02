@@ -7,11 +7,16 @@ use PDO;
 class Database {
     private static $conn;
 
+    private static $host = 'localhost';
+    private static $db_name = 'webshop_belgy';
+    private static $username = 'Belgy';
+    private static $password = '&#ccUgH3esDMe4-_e-^Da4i!WB^4vUks';
+
     public static function getConnection() {
         
         if (self::$conn === null) {
             try {
-                self::$conn = new PDO('mysql:host=localhost;dbname=webshop_belgy', 'Belgy', '&#ccUgH3esDMe4-_e-^Da4i!WB^4vUks');
+                self::$conn = new PDO("mysql:host=" . self::$host . ";dbname=" . self::$db_name, self::$username, self::$password);
                 // Set the PDO error mode to exception
                 self::$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             } catch(PDOException $e) {
@@ -21,7 +26,6 @@ class Database {
         }
         return self::$conn;
     }
-    
 
     public static function processCheckout($userId, $totalPrice, $cartItems) {
         $conn = self::getConnection();
