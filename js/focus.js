@@ -156,7 +156,7 @@ $(document).ready(function() {
             console.log('Product ID:', productId, 'Variant ID:', variantId); // Debugging line
         
             $.ajax({
-                url: '/classes/add_to_cart.php',
+                url: 'classes/add_to_cart.php',
                 type: 'POST',
                 data: { product_id: productId, variant_id: variantId }, // Include variant ID in the data
                 success: function(response) {

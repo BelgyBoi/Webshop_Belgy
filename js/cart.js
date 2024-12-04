@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function updateCart(productId, variantId, quantity) {
         const xhr = new XMLHttpRequest();
-        xhr.open('POST', '/classes/update_cart.php', true);
+        xhr.open('POST', 'classes/update_cart.php', true);
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         xhr.onload = function() {
             if (xhr.status === 200) {
@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function removeItem(productId, variantId) {
         const xhr = new XMLHttpRequest();
-        xhr.open('POST', '/classes/remove_from_cart.php', true);
+        xhr.open('POST', 'classes/remove_from_cart.php', true);
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         xhr.onload = function() {
             if (xhr.status === 200) {
