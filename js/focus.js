@@ -137,7 +137,7 @@ $(document).ready(function() {
         $('.delete-rating').on('click', function() {
             const ratingId = $(this).data('rating-id');
             $.ajax({
-                url: '/Webshop_Belgy/classes/delete_ratings.php',
+                url: '/classes/delete_ratings.php',
                 type: 'POST',
                 data: { rating_id: ratingId },
                 success: function(response) {
@@ -156,7 +156,7 @@ $(document).ready(function() {
             console.log('Product ID:', productId, 'Variant ID:', variantId); // Debugging line
         
             $.ajax({
-                url: '/Webshop_Belgy/classes/add_to_cart.php',
+                url: '/classes/add_to_cart.php',
                 type: 'POST',
                 data: { product_id: productId, variant_id: variantId }, // Include variant ID in the data
                 success: function(response) {

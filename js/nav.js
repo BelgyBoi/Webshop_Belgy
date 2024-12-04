@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let query = $(this).val();
         if (query.length > 0) {
             $.ajax({
-                url: '/Webshop_Belgy/classes/Search.php',
+                url: '/classes/Search.php',
                 type: 'GET',
                 data: { query: query },
                 success: function(response) {
@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let query = $('#search-bar').val();
         if (query.length > 0) {
             $.ajax({
-                url: '/Webshop_Belgy/classes/Search.php',
+                url: '/classes/Search.php',
                 type: 'GET',
                 data: { query: query },
                 success: function(response) {

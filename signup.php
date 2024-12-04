@@ -111,7 +111,7 @@ if (!empty($_POST)) {
             </div>
         </form>
     </div>
-    <a id="signUpLink" href="Webshop_Belgy/login.php">Already have an account? Login instead</a>
+    <a id="signUpLink" href="login.php">Already have an account? Login instead</a>
 </div>
 
 <script src="js/signup.js"></script>

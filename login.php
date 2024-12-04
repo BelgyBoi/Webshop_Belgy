@@ -94,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </div>
             </form>
         </div>
-        <a id="signUpLink" href="Webshop_Belgy/signup.php">Don't have an account yet? Sing up here</a>
+        <a id="signUpLink" href="signup.php">Don't have an account yet? Sing up here</a>
     </div>
 
     <script src="js/login.js"></script>
