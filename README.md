@@ -11,4 +11,6 @@ usefull info:
     - email:    admin@admin.com
     - password: admin123
 
+NOTE: For the best browsing experience, please use a browser like Chrome that allows surfing on HTTP. Currently, this website does not have an SSL certificate installed, so HTTPS is not available. This means that some browsers, such as Safari, may not be able to access it.
+
 I hope you enjoy this project!
