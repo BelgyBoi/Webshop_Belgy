@@ -9,7 +9,16 @@ $conn = Database::getConnection();
 $orderId = $_SESSION['order_id'];
 
 // Fetch order items from the database
-$orderItemsStatement = $conn->prepare('SELECT * FROM order_items WHERE order_id = :order_id');
+$orderItemsStatement = $conn->prepare('
+    SELECT oi.*, p.main_image_url, 
+           (SELECT vi.image_url 
+            FROM variant_images vi 
+            WHERE vi.variant_id = oi.variant_id 
+            LIMIT 1) AS variant_image_url 
+    FROM order_items oi 
+    LEFT JOIN products p ON oi.product_id = p.id 
+    WHERE oi.order_id = :order_id
+');
 $orderItemsStatement->bindValue(':order_id', $orderId);
 $orderItemsStatement->execute();
 $orderItems = $orderItemsStatement->fetchAll(PDO::FETCH_ASSOC);
@@ -31,12 +40,12 @@ $orderItems = $orderItemsStatement->fetchAll(PDO::FETCH_ASSOC);
         <h2>Purchased Items</h2>
         <?php foreach ($orderItems as $item): ?>
             <div class="product-item">
-                <img src="../<?php echo htmlspecialchars($item['main_image_url']); ?>" alt="<?php echo htmlspecialchars($item['product_name']); ?>" class="product-image">
+                <img src="../<?php echo htmlspecialchars($item['variant_image_url'] ? $item['variant_image_url'] : $item['main_image_url']); ?>" alt="<?php echo htmlspecialchars($item['product_name']); ?>" class="product-image">
                 <div>
                     <h3><?php echo htmlspecialchars($item['product_name']); ?></h3>
                     <p>Quantity: <?php echo htmlspecialchars($item['quantity']); ?></p>
                     <p>Price: €<?php echo htmlspecialchars($item['price']); ?> (Total: €<?php echo htmlspecialchars($item['price'] * $item['quantity']); ?>)</p>
-                    <p>Image URL: ../<?php echo htmlspecialchars($item['main_image_url']); ?></p> <!-- Debugging info -->
+                    <p>Image URL: ../<?php echo htmlspecialchars($item['variant_image_url'] ? $item['variant_image_url'] : $item['main_image_url']); ?></p> <!-- Debugging info -->
                 </div>
             </div>
         <?php endforeach; ?>
@@ -46,6 +55,6 @@ $orderItems = $orderItemsStatement->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </div>
 
-    <script src="../js/success.js"></script>
+    <!-- <script src="../js/success.js"></script> -->
 </body>
 </html>

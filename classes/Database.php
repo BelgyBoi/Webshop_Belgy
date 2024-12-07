@@ -29,72 +29,42 @@ class Database {
 
     public static function processCheckout($userId, $totalPrice, $cartItems) {
         $conn = self::getConnection();
-    
-        // Fetch user's current currency balance
-        $statement = $conn->prepare('SELECT currency FROM accounts WHERE id = :user_id');
-        $statement->bindValue(':user_id', $userId);
-        $statement->execute();
-        $user = $statement->fetch(PDO::FETCH_ASSOC);
-        $currentBalance = $user['currency'];
-    
-        // Check if user has enough currency
-        if ($currentBalance >= $totalPrice) {
-            // Start transaction
+        
+        try {
             $conn->beginTransaction();
     
-            try {
-                // Deduct total price from user's currency
-                $newBalance = $currentBalance - $totalPrice;
-                $updateStatement = $conn->prepare('UPDATE accounts SET currency = :new_balance WHERE id = :user_id');
-                $updateStatement->bindValue(':new_balance', $newBalance);
-                $updateStatement->bindValue(':user_id', $userId);
-                $updateStatement->execute();
+            // Insert order into orders table
+            $orderQuery = $conn->prepare("INSERT INTO orders (user_id, total_price) VALUES (:user_id, :total_price)");
+            $orderQuery->bindParam(':user_id', $userId, PDO::PARAM_INT);
+            $orderQuery->bindParam(':total_price', $totalPrice, PDO::PARAM_STR); // Use PDO::PARAM_STR for decimal values
+            $orderQuery->execute();
     
-                // Store order in orders table
-                $orderStatement = $conn->prepare('INSERT INTO orders (user_id, total_price) VALUES (:user_id, :total_price)');
-                $orderStatement->bindValue(':user_id', $userId);
-                $orderStatement->bindValue(':total_price', $totalPrice);
-                $orderStatement->execute();
-                $orderId = $conn->lastInsertId();
+            // Get the last inserted order ID
+            $orderId = $conn->lastInsertId();
     
-                // Store each product in order_items table
-                foreach ($cartItems as $item) {
-                    $orderItemStatement = $conn->prepare('INSERT INTO order_items (order_id, product_id, variant_id, product_name, quantity, price, main_image_url) VALUES (:order_id, :product_id, :variant_id, :product_name, :quantity, :price, :main_image_url)');
-                    $orderItemStatement->bindValue(':order_id', $orderId);
-                    $orderItemStatement->bindValue(':product_id', $item['id']);
-                    $orderItemStatement->bindValue(':variant_id', $item['variant_id']); // Handle variant ID
-                    $orderItemStatement->bindValue(':product_name', $item['name']);
-                    $orderItemStatement->bindValue(':quantity', $item['quantity']);
-                    $orderItemStatement->bindValue(':price', $item['price']);
-                    $orderItemStatement->bindValue(':main_image_url', $item['image']);
-                    $orderItemStatement->execute();
-                }
+            // Insert order items into order_items table
+            $orderItemQuery = $conn->prepare("INSERT INTO order_items (order_id, product_id, variant_id, quantity, price) VALUES (:order_id, :product_id, :variant_id, :quantity, :price)");
     
-                // Clear user's cart from the database (if applicable)
-                $clearCartStatement = $conn->prepare('DELETE FROM cart WHERE user_id = :user_id');
-                $clearCartStatement->bindValue(':user_id', $userId);
-                $clearCartStatement->execute();
-    
-                // Clear user's cart from the session
-                unset($_SESSION['cart']);
-    
-                // Commit transaction
-                $conn->commit();
-    
-                // Update session currency
-                $_SESSION['currency'] = $newBalance;
-    
-                return $orderId;
-            } catch (PDOException $e) {
-                // Rollback transaction if something goes wrong
-                $conn->rollBack();
-                return false;
+            foreach ($cartItems as $item) {
+                $orderItemQuery->bindParam(':order_id', $orderId, PDO::PARAM_INT);
+                $orderItemQuery->bindParam(':product_id', $item['id'], PDO::PARAM_INT);
+                $orderItemQuery->bindParam(':variant_id', $item['variant_id'], PDO::PARAM_INT);
+                $orderItemQuery->bindParam(':quantity', $item['quantity'], PDO::PARAM_INT);
+                $orderItemQuery->bindParam(':price', $item['price'], PDO::PARAM_STR); // Use PDO::PARAM_STR for decimal values
+                $orderItemQuery->execute();
             }
-        } else {
+    
+            // Commit the transaction
+            $conn->commit();
+    
+            return $orderId;
+        } catch (Exception $e) {
+            // Rollback the transaction in case of error
+            $conn->rollBack();
+            error_log("Error processing checkout: " . $e->getMessage());
             return false;
         }
-    }
-    
+    } 
        
 }
 

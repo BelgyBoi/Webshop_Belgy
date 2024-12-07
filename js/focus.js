@@ -1,4 +1,6 @@
 $(document).ready(function() {
+    const initialProductPrice = $('.product-price').text().replace('BC', '').trim();
+
     function initializeFeatures() {
         const $productCarousel = $('.product-carousel');
         const $variantCarousel = $('.variant-carousel');
@@ -34,7 +36,7 @@ $(document).ready(function() {
                 dots: false,
                 centerMode: true,
                 focusOnSelect: true,
-                arrows: false // Remove next and previous arrows
+                arrows: false
             });
         }
 
@@ -46,61 +48,63 @@ $(document).ready(function() {
                 dots: false,
                 centerMode: true,
                 focusOnSelect: true,
-                arrows: false // Remove next and previous arrows
+                arrows: false
             });
         }
 
-        $(document).ready(function() {
-            // Variant click handler to show variant images
-            $('.variant-link').on('click', function(event) {
-                event.preventDefault();
-                const variantId = $(this).data('variant-id');
-                console.log('Variant ID:', variantId); // Debugging line
-        
-                // Hide product carousel and show variant carousel
-                $productCarousel.addClass('hidden').slick('unslick');
-                $productThumbnails.addClass('hidden').slick('unslick');
-                $variantCarousel.removeClass('hidden').slick('refresh');
-                $variantThumbnails.removeClass('hidden').slick('refresh');
-        
-                // Update add-to-cart button to include variant ID
+        // Variant click handler to show variant images and update price
+       // Variant click handler to show variant images and update price
+$('.variant-link').on('click', function(event) {
+    event.preventDefault();
+    const variantId = $(this).data('variant-id');
+    console.log('Variant ID:', variantId);
+
+    // Fetch variant price via AJAX
+    $.ajax({
+        url: 'classes/get_variant_price.php',
+        type: 'GET',
+        data: { variant_id: variantId },
+        success: function(response) {
+            console.log('AJAX response:', response); // Debugging
+            response = typeof response === 'string' ? JSON.parse(response) : response;
+            if (response.status === 'success' && response.price !== undefined) {
+                console.log('Price fetched successfully:', response.price); // Logging
+                // Update the price
+                $('.product-price').text(`BC${response.price}`);
+    
+                // Update the add-to-cart button to include variant ID
                 $('.add-to-cart').data('variant-id', variantId);
-        
-                // Update add-to-cart button text to include variant name
-                const variantName = $(this).find('img').attr('alt');
-            });
-        
-            // Handle clicking on product link to switch back to product images
-            $('.product-link').on('click', function(event) {
-                event.preventDefault();
-        
-                // Hide variant carousel and show product carousel
-                $variantCarousel.addClass('hidden').slick('unslick');
-                $variantThumbnails.addClass('hidden').slick('unslick');
-                $productCarousel.removeClass('hidden').slick('refresh');
-                $productThumbnails.removeClass('hidden').slick('refresh');
-        
-                // Remove variant ID from add-to-cart button
-                $('.add-to-cart').removeData('variant-id');
-        
-                // Restore default add-to-cart button text
-                $('.add-to-cart').text('Add to cart');
-            });
-        });
-        
-        
+            } else {
+                console.error('Error fetching variant price:', response.message);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('AJAX error:', status, error);
+        }
+    });
+    
+
+    // Hide product carousel and show variant carousel
+    $productCarousel.addClass('hidden');
+    $productThumbnails.addClass('hidden');
+    $variantCarousel.removeClass('hidden').slick('setPosition');
+    $variantThumbnails.removeClass('hidden').slick('setPosition');
+});
 
         // Handle clicking on product link to switch back to product images
         $('.product-link').on('click', function(event) {
             event.preventDefault();
 
-            $variantCarousel.addClass('hidden').slick('unslick');
-            $variantThumbnails.addClass('hidden').slick('unslick');
-            $productCarousel.removeClass('hidden').slick('refresh');
-            $productThumbnails.removeClass('hidden').slick('refresh');
+            $variantCarousel.addClass('hidden');
+            $variantThumbnails.addClass('hidden');
+            $productCarousel.removeClass('hidden').slick('setPosition');
+            $productThumbnails.removeClass('hidden').slick('setPosition');
 
             // Remove variant ID from add-to-cart button
             $('.add-to-cart').removeData('variant-id');
+
+            // Restore default product price
+            $('.product-price').text(`BC${initialProductPrice}`);
         });
 
         // Star rating hover and click functionality
@@ -137,7 +141,7 @@ $(document).ready(function() {
         $('.delete-rating').on('click', function() {
             const ratingId = $(this).data('rating-id');
             $.ajax({
-                url: '/classes/delete_ratings.php',
+                url: 'classes/delete_ratings.php', // Ensure this matches your endpoint
                 type: 'POST',
                 data: { rating_id: ratingId },
                 success: function(response) {
@@ -146,32 +150,35 @@ $(document).ready(function() {
                     } else {
                         alert('Error deleting rating');
                     }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX error:', status, error);
                 }
             });
         });
 
+        // Handle add to cart
         $('.add-to-cart').on('click', function() {
             const productId = $(this).data('product-id');
-            const variantId = $(this).data('variant-id'); // Get the variant ID if any
-            console.log('Product ID:', productId, 'Variant ID:', variantId); // Debugging line
-        
+            const variantId = $(this).data('variant-id');
+            console.log('Product ID:', productId, 'Variant ID:', variantId);
+
             $.ajax({
                 url: 'classes/add_to_cart.php',
                 type: 'POST',
-                data: { product_id: productId, variant_id: variantId }, // Include variant ID in the data
+                data: { product_id: productId, variant_id: variantId },
                 success: function(response) {
-                    console.log('AJAX response:', response); // Debugging line
+                    console.log('AJAX response:', response);
                     if (!sessionStorage.getItem('popupShown')) {
                         showPopup();
-                        sessionStorage.setItem('popupShown', 'true'); // Ensure popup appears only once per session
+                        sessionStorage.setItem('popupShown', 'true');
                     }
                 },
                 error: function(xhr, status, error) {
-                    console.error('AJAX error:', status, error); // Debugging line
+                    console.error('AJAX error:', status, error);
                 }
             });
         });
-        
 
         function showPopup() {
             const popupOverlay = document.getElementById('popup-overlay');

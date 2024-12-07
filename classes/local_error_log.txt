@@ -1,0 +1,12 @@
+[07-Dec-2024 17:01:13 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to undefined function console_log() in C:\xampp\htdocs\Webshop_Belgy\classes\checkout.php:17
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\Webshop_Belgy\classes\checkout.php on line 17
+[07-Dec-2024 17:01:37 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to undefined function console_log() in C:\xampp\htdocs\Webshop_Belgy\classes\checkout.php:28
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\Webshop_Belgy\classes\checkout.php on line 28
+[07-Dec-2024 17:04:27 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to undefined function console_log() in C:\xampp\htdocs\Webshop_Belgy\classes\checkout.php:22
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\Webshop_Belgy\classes\checkout.php on line 22

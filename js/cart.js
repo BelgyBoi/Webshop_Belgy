@@ -51,10 +51,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (response.status === 'success') {
                         // Update the total price
                         document.querySelector('.summary-total').textContent = `Total: BC${response.total.toFixed(2)}`;
-                        // If quantity is 0, remove the item from the cart
-                        if (quantity == 0) {
-                            document.querySelector(`.product-item[data-product-id="${productId}"][data-variant-id="${variantId}"]`).remove();
-                        }
                     } else {
                         alert('Error updating cart: ' + (response.message || 'Unknown error'));
                     }

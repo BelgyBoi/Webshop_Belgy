@@ -26,24 +26,8 @@ if ($conn) {
         $product_images = $productFetcher->getProductImages($product_id);
         $product_variants = $productFetcher->getProductVariants($product_id);
 
-        if (!is_array($product_images)) {
-            echo 'Error: $product_images is not an array. Value: ';
-            var_dump($product_images);
-            exit;
-        }
-        if (!is_array($product_variants)) {
-            echo 'Error: $product_variants is not an array. Value: ';
-            var_dump($product_variants);
-            exit;
-        }
-
         foreach ($product_variants as $variant) {
             $variant_images[$variant['id']] = $productFetcher->getVariantImages($variant['id']);
-            if (!is_array($variant_images[$variant['id']])) {
-                echo 'Error: $variant_images[' . $variant['id'] . '] is not an array. Value: ';
-                var_dump($variant_images[$variant['id']]);
-                exit;
-            }
         }
 
         if ($product) {
@@ -66,6 +50,14 @@ if ($conn) {
 if (!$product) {
     echo 'Product not found or connection failed';
     exit;
+}
+
+$price = $product['price'];
+if ($variant_id) {
+    $selected_variant = $productFetcher->getVariantById($variant_id);
+    if ($selected_variant) {
+        $price = $selected_variant['price'];
+    }
 }
 ?>
 
@@ -94,94 +86,94 @@ include_once("classes/widgets.php");
 
 <div class="product-details">
     <div id="main_content">
-    <h1><?php echo htmlspecialchars($product['name']); ?></h1>
+        <h1><?php echo htmlspecialchars($product['name']); ?></h1>
 
-    <!-- Product Images Carousel -->
-    <div class="carousel product-carousel">
-        <?php foreach ($product_images as $image): ?>
-            <div><img class="focus_image" src="<?php echo htmlspecialchars($image); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>"></div>
-        <?php endforeach; ?>
-    </div>
-    
-    <!-- Variant Images Carousel -->
-    <div class="carousel variant-carousel hidden">
-        <?php foreach ($variant_images as $variant_id => $images): ?>
-            <?php foreach ($images as $image): ?>
-                <div><img class="focus_image" src="<?php echo htmlspecialchars($image); ?>" alt=""></div>
+        <!-- Product Images Carousel -->
+        <div class="carousel product-carousel">
+            <?php foreach ($product_images as $image): ?>
+                <div><img class="focus_image" src="<?php echo htmlspecialchars($image['image_url']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>"></div>
             <?php endforeach; ?>
-        <?php endforeach; ?>
-    </div>
-
-    <div class="carousel-thumbnails product-thumbnails">
-        <?php foreach ($product_images as $image): ?>
-            <div><img class="small_image" src="<?php echo htmlspecialchars($image); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>"></div>
-        <?php endforeach; ?>
-    </div>
-    
-    <div class="carousel-thumbnails variant-thumbnails hidden">
-        <?php foreach ($variant_images as $variant_id => $images): ?>
-            <?php foreach ($images as $image): ?>
-                <div><img class="small_image" src="<?php echo htmlspecialchars($image); ?>" alt=""></div>
-            <?php endforeach; ?>
-        <?php endforeach; ?>
-    </div>
-    
-    <!-- Variant Links -->
-    <?php if (!empty($product_variants)) : ?>
-        <div class="product-variants">
-            <?php foreach ($product_variants as $variant) : ?>
-                <?php if (!empty($variant_images[$variant['id']])) : ?>
-                    <a href="#" class="variant-link link" data-variant-id="<?php echo $variant['id']; ?>">
-                        <img class="variant-image link_image" src="<?php echo htmlspecialchars($variant_images[$variant['id']][0]); ?>" alt="<?php echo htmlspecialchars($variant['variant_name']); ?>">
-                    </a>
-                <?php endif; ?>
-            <?php endforeach; ?>
-            <a href="#" class="product-link link">
-                <img class="variant-image link_image" src="<?php echo htmlspecialchars($product_images[0]); ?>" alt="Back to Product Images">
-            </a>
         </div>
-    <?php endif; ?>
-    
-    <p class="product-price">BC<?php echo htmlspecialchars($product['price']); ?></p>
-    <button class="add-to-cart product_button" data-product-id="<?php echo $product_id; ?>">Add to cart</button>
-    <p class="product-description"><?php echo htmlspecialchars($product['description']); ?></p>
-
-    <!-- Rating Display -->
-    <div class="product-ratings">
-        <h3>Average Rating: <?php echo number_format($averageRating, 1); ?> / 5</h3>
-        <div class="average-rating-stars">
-            <?php for ($i = 1; $i <= 5; $i++): ?>
-                <?php if ($i <= round($averageRating)): ?>
-                    <i class="fas fa-star"></i>
-                <?php else: ?>
-                    <i class="far fa-star"></i>
-                <?php endif; ?>
-            <?php endfor; ?>
+        
+        <!-- Variant Images Carousel -->
+        <div class="carousel variant-carousel hidden">
+            <?php foreach ($variant_images as $variant_id => $images): ?>
+                <?php foreach ($images as $image): ?>
+                    <div><img class="focus_image" src="<?php echo htmlspecialchars($image['image_url']); ?>" alt=""></div>
+                <?php endforeach; ?>
+            <?php endforeach; ?>
         </div>
-        <?php if (!empty($ratings)): ?>
-            <?php foreach ($ratings as $rating): ?>
-                <div class="rating">
-                    <p><b><?php echo htmlspecialchars($rating['firstname']) . ' ' . htmlspecialchars($rating['lastname']); ?></b></p>
-                    <p>Rating: 
-                        <?php for ($i = 1; $i <= 5; $i++): ?>
-                            <?php if ($i <= $rating['rating']): ?>
-                                <i class="fas fa-star"></i>
-                            <?php else: ?>
-                                <i class="far fa-star"></i>
-                            <?php endif; ?>
-                        <?php endfor; ?>
-                    </p>
-                    <p><?php echo htmlspecialchars($rating['review']); ?></p>
-                    <p><small><?php echo htmlspecialchars($rating['created_at']); ?></small></p>
-                    <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $rating['user_id']): ?>
-                        <button class="delete-rating" data-rating-id="<?php echo $rating['id']; ?>"><i class="fas fa-trash-alt"></i></button>
+
+        <div class="carousel-thumbnails product-thumbnails">
+            <?php foreach ($product_images as $image): ?>
+                <div><img class="small_image" src="<?php echo htmlspecialchars($image['image_url']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>"></div>
+            <?php endforeach; ?>
+        </div>
+        
+        <div class="carousel-thumbnails variant-thumbnails hidden">
+            <?php foreach ($variant_images as $variant_id => $images): ?>
+                <?php foreach ($images as $image): ?>
+                    <div><img class="small_image" src="<?php echo htmlspecialchars($image['image_url']); ?>" alt=""></div>
+                <?php endforeach; ?>
+            <?php endforeach; ?>
+        </div>
+        
+        <!-- Variant Links -->
+        <?php if (!empty($product_variants)) : ?>
+            <div class="product-variants">
+                <?php foreach ($product_variants as $variant) : ?>
+                    <?php if (!empty($variant_images[$variant['id']])) : ?>
+                        <a href="#" class="variant-link link" data-variant-id="<?php echo $variant['id']; ?>">
+                            <img class="variant-image link_image" src="<?php echo htmlspecialchars($variant_images[$variant['id']][0]['image_url']); ?>" alt="<?php echo htmlspecialchars($variant['variant_name']); ?>">
+                        </a>
                     <?php endif; ?>
-                </div>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <p>No ratings yet.</p>
+                <?php endforeach; ?>
+                <a href="#" class="product-link link">
+                    <img class="variant-image link_image" src="<?php echo htmlspecialchars($product_images[0]['image_url']); ?>" alt="Back to Product Images">
+                </a>
+            </div>
         <?php endif; ?>
-    </div>
+
+        <p class="product-price">BC<?php echo htmlspecialchars($price); ?></p>
+        <button class="add-to-cart product_button" data-product-id="<?php echo $product_id; ?>">Add to cart</button>
+        <p class="product-description"><?php echo htmlspecialchars($product['description']); ?></p>
+
+        <!-- Rating Display -->
+        <div class="product-ratings">
+            <h3>Average Rating: <?php echo number_format($averageRating, 1); ?> / 5</h3>
+            <div class="average-rating-stars">
+                <?php for ($i = 1; $i <= 5; $i++): ?>
+                    <?php if ($i <= round($averageRating)): ?>
+                        <i class="fas fa-star"></i>
+                    <?php else: ?>
+                        <i class="far fa-star"></i>
+                    <?php endif; ?>
+                <?php endfor; ?>
+            </div>
+            <?php if (!empty($ratings)): ?>
+                <?php foreach ($ratings as $rating): ?>
+                    <div class="rating">
+                        <p><b><?php echo htmlspecialchars($rating['firstname']) . ' ' . htmlspecialchars($rating['lastname']); ?></b></p>
+                        <p>Rating: 
+                            <?php for ($i = 1; $i <= 5; $i++): ?>
+                                <?php if ($i <= $rating['rating']): ?>
+                                    <i class="fas fa-star"></i>
+                                <?php else: ?>
+                                    <i class="far fa-star"></i>
+                                <?php endif; ?>
+                            <?php endfor; ?>
+                        </p>
+                        <p><?php echo htmlspecialchars($rating['review']); ?></p>
+                        <p><small><?php echo htmlspecialchars($rating['created_at']); ?></small></p>
+                        <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $rating['user_id']): ?>
+                            <button class="delete-rating" data-rating-id="<?php echo $rating['id']; ?>"><i class="fas fa-trash-alt"></i></button>
+                        <?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <p>No ratings yet.</p>
+            <?php endif; ?>
+        </div>
     </div>
 
     <!-- Rating Form -->

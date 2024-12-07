@@ -15,6 +15,7 @@ form {
     border: 1px solid #ddd;
     border-radius: 4px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    height: auto; /* Ensure height adjusts dynamically */
 }
 
 label {
@@ -103,7 +104,7 @@ button,
     background-color: Red !important;
 }
 
-button:hover{
+button:hover {
     background: #555;
 }
 
@@ -114,6 +115,17 @@ button:hover{
 button:active,
 .dashboard a:active {
     transform: scale(0.95);
+}
+
+/* Ensure buttons are always visible */
+button {
+    max-height: none !important;
+    max-width: none !important;
+}
+
+/* Allow height to change dynamically */
+form, .additional-image-wrapper {
+    height: fit-content !important; /* Ensure containers can grow in height */
 }
 
 .errors {
@@ -162,7 +174,6 @@ select option:focus {
     background-color: #333;
     text-align: center;
     border-radius: 4px;
-    padding: 5px;
 }
 
 .small_button:hover {
@@ -172,3 +183,53 @@ select option:focus {
 .small_button:active {
     transform: scale(0.95);
 }
+
+.clear-image-btn,
+.custom-remove-image-btn {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    color: #666;
+    cursor: pointer;
+    font-size: 14px;
+    margin-left: 10px;
+    padding: 4px 8px;
+}
+
+.clear-image-btn:hover,
+.custom-remove-image-btn:hover {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    color: #ff0000;
+}
+
+.additional-image-wrapper {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.additional-image-wrapper input {
+    margin-right: 10px;
+}
+
+.additional-image-wrapper button {
+    margin-left: 10px;
+}
+
+/* Style for form_field to ensure dynamic height */
+.button {
+    width: 80px !important;
+    height: auto !important;
+}
+
+.form_field {
+    height: fit-content !important;
+
+}
+
+.choose_new_file {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+

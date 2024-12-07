@@ -5,13 +5,18 @@ require 'vendor/autoload.php';
 
 use WebshopBelgy\Database;
 use WebshopBelgy\CategoryFetcher;
+use WebshopBelgy\ProductFetcher;
 
 $conn = Database::getConnection();
 $categories = [];
+$products = [];
 
 if ($conn) {
     $categoryFetcher = new CategoryFetcher($conn);
     $categories = $categoryFetcher->getCategories();
+
+    $productFetcher = new ProductFetcher($conn);
+    $products = $productFetcher->getAllProducts();
 
     if (empty($categories)) {
         error_log('No categories found');
@@ -22,58 +27,110 @@ if ($conn) {
     error_log('Connection failed');
 }
 
-$errors = []; // Assuming you have error handling somewhere
+$errors = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = $_POST['name'] ?? '';
     $price = $_POST['price'] ?? '';
     $description = $_POST['description'] ?? '';
-    $main_image_url = $_POST['main_image_url'] ?? '';
-    $additional_images = $_POST['additional_images'] ?? '';
     $category_id = $_POST['category_id'] ?? '';
+    $product_type = $_POST['product_type'] ?? 'product';
+    $original_product_id = $_POST['original_product_id'] ?? null;
+    $main_image_url = '';
 
     // Validation
     if (empty($name)) $errors[] = 'Name is required';
     if (empty($price)) $errors[] = 'Price is required';
     if (empty($description)) $errors[] = 'Description is required';
-    if (empty($main_image_url)) $errors[] = 'Main image URL is required';
     if (empty($category_id)) $errors[] = 'Category is required';
 
-    if (empty($errors)) {
-        // Insert into products table
-        $statement = $conn->prepare('INSERT INTO products (name, price, description, main_image_url, category_id) VALUES (:name, :price, :description, :main_image_url, :category_id)');
-        $statement->bindValue(':name', $name);
-        $statement->bindValue(':price', $price);
-        $statement->bindValue(':description', $description);
-        $statement->bindValue(':main_image_url', $main_image_url);
-        $statement->bindValue(':category_id', $category_id);
+    // Handle main image upload
+    if ($product_type === 'product' && isset($_FILES['main_image']) && $_FILES['main_image']['error'] === 0) {
+        $target_dir = "assets/";
+        $target_file = $target_dir . basename($_FILES["main_image"]["name"]);
+        $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 
-        if ($statement->execute()) {
-            // Get the last inserted product ID
-            $product_id = $conn->lastInsertId();
-
-            // Insert additional images into product_images table
-            $additional_images_array = explode(',', $additional_images);
-            foreach ($additional_images_array as $image_url) {
-                $image_url = trim($image_url);
-                if (!empty($image_url)) {
-                    $image_statement = $conn->prepare('INSERT INTO product_images (product_id, image_url) VALUES (:product_id, :image_url)');
-                    $image_statement->bindValue(':product_id', $product_id);
-                    $image_statement->bindValue(':image_url', $image_url);
-                    $image_statement->execute();
-                }
+        // Check if image file is an actual image or fake image
+        $check = getimagesize($_FILES["main_image"]["tmp_name"]);
+        if ($check !== false) {
+            if (move_uploaded_file($_FILES["main_image"]["tmp_name"], $target_file)) {
+                $main_image_url = $target_file;
+            } else {
+                $errors[] = "Sorry, there was an error uploading your file.";
             }
-
-            // Redirect to admin.php after successful addition
-            header('Location: admin.php');
-            exit();
         } else {
-            $errors[] = 'Failed to add product';
+            $errors[] = "File is not an image.";
+        }
+    }
+
+    if (empty($errors)) {
+        if ($product_type === 'variant' && $original_product_id) {
+            // Insert variant
+            $statement = $conn->prepare('INSERT INTO product_variants (product_id, variant_name, price) VALUES (:product_id, :variant_name, :price)');
+            $statement->bindValue(':product_id', $original_product_id);
+            $statement->bindValue(':variant_name', $name);
+            $statement->bindValue(':price', $price);
+            if ($statement->execute()) {
+                $variant_id = $conn->lastInsertId();
+
+                // Handle additional images for the variant
+                if (isset($_FILES['additional_images']) && !empty($_FILES['additional_images']['name'][0])) {
+                    $additional_images = $_FILES['additional_images'];
+                    foreach ($additional_images['name'] as $index => $filename) {
+                        $tmp_name = $additional_images['tmp_name'][$index];
+                        $target_file = $target_dir . basename($filename);
+                        if (move_uploaded_file($tmp_name, $target_file)) {
+                            $image_url = $target_file;
+                            $stmt = $conn->prepare('INSERT INTO variant_images (variant_id, image_url) VALUES (:variant_id, :image_url)');
+                            $stmt->bindValue(':variant_id', $variant_id);
+                            $stmt->bindValue(':image_url', $image_url);
+                            $stmt->execute();
+                        }
+                    }
+                }
+
+                header('Location: admin.php');
+                exit();
+            } else {
+                $errors[] = 'Failed to add variant';
+            }
+        } else {
+            // Insert into products table
+            $statement = $conn->prepare('INSERT INTO products (name, price, description, main_image_url, category_id) VALUES (:name, :price, :description, :main_image_url, :category_id)');
+            $statement->bindValue(':name', $name);
+            $statement->bindValue(':price', $price);
+            $statement->bindValue(':description', $description);
+            $statement->bindValue(':main_image_url', $main_image_url);
+            $statement->bindValue(':category_id', $category_id);
+
+            if ($statement->execute()) {
+                $product_id = $conn->lastInsertId();
+
+                // Handle additional images for the product
+                if (isset($_FILES['additional_images']) && !empty($_FILES['additional_images']['name'][0])) {
+                    $additional_images = $_FILES['additional_images'];
+                    foreach ($additional_images['name'] as $index => $filename) {
+                        $tmp_name = $additional_images['tmp_name'][$index];
+                        $target_file = $target_dir . basename($filename);
+                        if (move_uploaded_file($tmp_name, $target_file)) {
+                            $image_url = $target_file;
+                            $stmt = $conn->prepare('INSERT INTO product_images (product_id, image_url) VALUES (:product_id, :image_url)');
+                            $stmt->bindValue(':product_id', $product_id);
+                            $stmt->bindValue(':image_url', $image_url);
+                            $stmt->execute();
+                        }
+                    }
+                }
+
+                header('Location: admin.php');
+                exit();
+            } else {
+                $errors[] = 'Failed to add product';
+            }
         }
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -84,12 +141,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
     <h1>Add New Product</h1>
-    
-    <!-- Dashboard Button -->
     <nav class="dashboard">
         <a href="admin.php" class="button">Dashboard</a>
     </nav>
-    
+
     <?php if (!empty($errors)) : ?>
         <div class="errors">
             <ul>
@@ -99,15 +154,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </ul>
         </div>
     <?php endif; ?>
-    
-    <form method="POST" action="add_product.php">
-        <label>Name: <input type="text" name="name" value="<?= htmlspecialchars($_POST['name'] ?? '') ?>" required></label><br>
-        <label>Price: <input type="number" name="price" value="<?= htmlspecialchars($_POST['price'] ?? '') ?>" required></label><br>
-        <label>Description: <textarea class="description" name="description" required><?= htmlspecialchars($_POST['description'] ?? '') ?></textarea></label><br>
-        <label>Main Image URL: <input type="text" name="main_image_url" value="<?= htmlspecialchars($_POST['main_image_url'] ?? '') ?>" required></label><br>
-        <label>Additional Images (comma-separated URLs): <textarea class="more_urls" name="additional_images" rows="3"><?= htmlspecialchars($_POST['additional_images'] ?? '') ?></textarea></label><br>
+
+    <form method="POST" action="add_product.php" enctype="multipart/form-data">
+        <label>
+            <input type="radio" name="product_type" value="product" checked> Product
+        </label>
+        <label>
+            <input type="radio" name="product_type" value="variant"> Variant
+        </label><br>
+
+        <div id="variant-section" style="display: none;">
+            <label>Original Product:
+                <select name="original_product_id" id="original-product-id">
+                    <option value="">Select a product</option>
+                    <?php foreach ($products as $product) : ?>
+                        <option value="<?= $product['id'] ?>"><?= $product['name'] ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </label><br>
+        </div>
+
+        <label>Name: <input type="text" name="name" id="name" value="<?= htmlspecialchars($_POST['name'] ?? '') ?>" required></label><br>
+        <label>Price: <input type="number" name="price" id="price" value="<?= htmlspecialchars($_POST['price'] ?? '') ?>" required></label><br>
+        <label>Description: <textarea class="description" name="description" id="description" required><?= htmlspecialchars($_POST['description'] ?? '') ?></textarea></label><br>
+        <div id="main-image-url-field">
+            <label>Main Image: 
+                <input type="file" name="main_image" id="main_image">
+                <button type="button" id="clear-main-image-btn" class="clear-image-btn">x</button>
+            </label><br>
+        </div>
+        <div id="additional-images-container">
+            <label>Additional Images:</label>
+        </div><br>
         <label>Category:
-            <select name="category_id" required>
+            <select name="category_id" id="category_id" required>
                 <?php foreach ($categories as $category) : ?>
                     <option value="<?= htmlspecialchars($category['id']) ?>" <?= (isset($_POST['category_id']) && $_POST['category_id'] == $category['id']) ? 'selected' : '' ?>><?= htmlspecialchars($category['name']) ?></option>
                 <?php endforeach; ?>
@@ -115,5 +195,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </label><br>
         <button type="submit">Add Product</button>
     </form>
+
+    <script src="js/admin.js"></script>
 </body>
 </html>
