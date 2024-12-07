@@ -55,6 +55,6 @@ $orderItems = $orderItemsStatement->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </div>
 
-    <!-- <script src="../js/success.js"></script> -->
+    <script src="../js/success.js"></script>
 </body>
 </html>

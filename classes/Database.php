@@ -43,7 +43,7 @@ class Database {
             $orderId = $conn->lastInsertId();
     
             // Insert order items into order_items table
-            $orderItemQuery = $conn->prepare("INSERT INTO order_items (order_id, product_id, variant_id, quantity, price) VALUES (:order_id, :product_id, :variant_id, :quantity, :price)");
+            $orderItemQuery = $conn->prepare("INSERT INTO order_items (order_id, product_id, variant_id, quantity, price, product_name) VALUES (:order_id, :product_id, :variant_id, :quantity, :price, :product_name)");
     
             foreach ($cartItems as $item) {
                 $orderItemQuery->bindParam(':order_id', $orderId, PDO::PARAM_INT);
@@ -51,6 +51,7 @@ class Database {
                 $orderItemQuery->bindParam(':variant_id', $item['variant_id'], PDO::PARAM_INT);
                 $orderItemQuery->bindParam(':quantity', $item['quantity'], PDO::PARAM_INT);
                 $orderItemQuery->bindParam(':price', $item['price'], PDO::PARAM_STR); // Use PDO::PARAM_STR for decimal values
+                $orderItemQuery->bindParam(':product_name', $item['name'], PDO::PARAM_STR); // Ensure product_name is provided
                 $orderItemQuery->execute();
             }
     
@@ -64,7 +65,8 @@ class Database {
             error_log("Error processing checkout: " . $e->getMessage());
             return false;
         }
-    } 
+    }
+    
        
 }
 
